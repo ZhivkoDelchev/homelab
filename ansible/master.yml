@@ -1,0 +1,8 @@
+- name: Setup environment
+  hosts: all
+  remote_user: root
+  become:      yes
+  roles:
+    - disable-swap
+    - bootup-modules
+    - apt-setup

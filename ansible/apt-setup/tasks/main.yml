@@ -1,0 +1,41 @@
+---
+- block:
+  # - name: Debug printing variuables
+  #   shell: |
+  #     echo OS: {{ os }} && \
+  #     echo k8s full version: {{ kubernetes.version_full }} && \
+  #     echo k8s short version: {{ kubernetes.version_short }} 
+  #   register: command_output
+
+  # - debug:
+  #     var: command_output.stdout_lines
+  # Add docker to apt
+  - name: Add Docker GPG apt Key
+    become: true
+    apt_key:
+      url: '{{ item }}'
+      state: present
+    loop:
+      - https://download.docker.com/linux/ubuntu/gpg
+      - https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ kubernetes.version_short }}/{{ os }}/Release.key
+      - https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ os }}/Release.key
+      - https://packages.cloud.google.com/apt/doc/apt-key.gpg
+  - name: Add Docker Repository
+    become: true
+    apt_repository:
+      repo: '{{ item }}'
+      state: present
+    loop:
+      - deb https://download.docker.com/linux/ubuntu focal stable
+      - deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ os }}/ /
+      - deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ kubernetes.version_short }}/{{ os }}/ /
+      # - deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main
+      - deb https://apt.kubernetes.io/ kubernetes-xenial main
+
+  # Update & Upgrade
+  - name: Update and upgrade apt packages
+    become: true
+    apt:
+      upgrade: yes
+      update_cache: yes
+      cache_valid_time: 86400 #One day
