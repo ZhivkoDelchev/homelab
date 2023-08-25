@@ -11,6 +11,8 @@ KUBERNETES_VERSION_FULL = settings["software"]["kubernetes"]
 KUBERNETES_VERSION_SHORT = KUBERNETES_VERSION_FULL.match(/^([0-9]+\.[0-9]+)\.([0-9]+-[0-9]+)$/).captures[0]
 OS = settings["software"]["os"]
 
+ENVIRONMENT = settings["environment"]
+
 Vagrant.configure("2") do |config|
  
   # config.vm.box = "ubuntu/jammy64"
@@ -42,8 +44,9 @@ Vagrant.configure("2") do |config|
           version_short: KUBERNETES_VERSION_SHORT,
           version_full: KUBERNETES_VERSION_FULL
         },
-        os: OS
-        
+        os: OS,
+        environment: ENVIRONMENT,
+        local_ip: settings["network"]["control_ip"]
       }
     end
     # master.vm.provision "shell",
@@ -85,9 +88,15 @@ Vagrant.configure("2") do |config|
   #       # ansible.provisioning_path = "/home/vagrant/box/ansible"
   #       ansible.provisioning_path = "/vagrant/ansible/"
   #       ansible.playbook = "worker.yml"
-  #       # ansible.extra_vars = {
-          
-  #       # }
+  #       ansible.extra_vars = {
+  #          kubernetes: {
+  #             version_short: KUBERNETES_VERSION_SHORT,
+  #             version_full: KUBERNETES_VERSION_FULL
+  #           },
+  #           os: OS,
+  #           environment: ENVIRONMENT,
+  #           local_ip: IP_NW + "#{IP_START + i}"
+  #       }
   #     end
   #     # node.vm.provision "shell",
   #     #   env: {

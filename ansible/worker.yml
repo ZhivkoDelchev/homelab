@@ -6,4 +6,5 @@
     - disable-swap
     - bootup-modules
     - apt-setup
-
+    - tools
+    - cri
