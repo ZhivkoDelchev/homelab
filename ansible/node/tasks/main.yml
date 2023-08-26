@@ -1,0 +1,19 @@
+---
+- block:
+  - name: Run join script
+    shell: |
+      config_path="/vagrant/configs"
+      /bin/bash $config_path/join.sh -v
+    become: true
+
+  - name: Configure vagrant user and label node
+    shell: |
+      config_path="/vagrant/configs"
+      NODENAME=$(hostname -s)
+      whoami
+      mkdir -p /home/vagrant/.kube
+      sudo cp -i $config_path/config /home/vagrant/.kube/
+      sudo chown 1000:1000 /home/vagrant/.kube/config
+      kubectl label node $NODENAME node-role.kubernetes.io/worker=worker
+    become: true
+    become_user: vagrant

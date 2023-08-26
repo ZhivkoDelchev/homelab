@@ -1,6 +1,7 @@
 ---
 - block:
   - name: Install tools over apt
+    become: yes
     apt:
       name: '{{ packages }}'
     vars:
@@ -14,7 +15,7 @@
         - kubeadm
         - jq
   - name: Setup crio
-    become: true
+    become: yes
     shell: |
       cat >> /etc/default/crio << EOF
       {{ environment }}
@@ -22,8 +23,14 @@
       systemctl daemon-reload && \
       systemctl enable crio --now
   - name: Set local IP
+    become: yes
     shell: |
-      cat > /etc/default/kubelet << EOF && \
+      cat > /etc/default/kubelet << EOF
       KUBELET_EXTRA_ARGS=--node-ip={{ local_ip }}
       {{ environment }}
       EOF
+  - name: Start cri-o service
+    become: yes
+    shell: | 
+      systemctl start crio
+      systemctl enable crio

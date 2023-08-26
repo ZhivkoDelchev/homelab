@@ -11,7 +11,7 @@
   #     var: command_output.stdout_lines
   # Add docker to apt
   - name: Add Docker GPG apt Key
-    become: true
+    become: yes
     apt_key:
       url: '{{ item }}'
       state: present
@@ -19,9 +19,10 @@
       - https://download.docker.com/linux/ubuntu/gpg
       - https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ kubernetes.version_short }}/{{ os }}/Release.key
       - https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ os }}/Release.key
-      - https://packages.cloud.google.com/apt/doc/apt-key.gpg
+      # - https://packages.cloud.google.com/apt/doc/apt-key.gpg
+      - https://pkgs.k8s.io/core:/stable:/v{{ kubernetes.version_short }}/deb/Release.key
   - name: Add Docker Repository
-    become: true
+    become: yes
     apt_repository:
       repo: '{{ item }}'
       state: present
@@ -30,11 +31,13 @@
       - deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ os }}/ /
       - deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ kubernetes.version_short }}/{{ os }}/ /
       # - deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main
-      - deb https://apt.kubernetes.io/ kubernetes-xenial main
+      # - deb https://apt.kubernetes.io/ kubernetes-xenial main
+      # - deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /
+      - deb https://pkgs.k8s.io/core:/stable:/v{{ kubernetes.version_short }}/deb/ /
 
   # Update & Upgrade
   - name: Update and upgrade apt packages
-    become: true
+    become: yes
     apt:
       upgrade: yes
       update_cache: yes

@@ -3,8 +3,5 @@
   remote_user: root
   become:      yes
   roles:
-    - disable-swap
-    - bootup-modules
-    - apt-setup
-    - tools
-    - cri
+    - from-chatgpt
+    - node
