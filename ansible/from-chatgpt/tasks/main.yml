@@ -111,13 +111,13 @@
 
   - name: Add Kubernetes apt repository key
     apt_key:
-      url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+      url: https://pkgs.k8s.io/core:/stable:/v{{ kubernetes.version_short }}/deb/Release.key
       state: present
       keyring: /etc/apt/keyrings/kubernetes-archive-keyring.gpg
 
   - name: Add Kubernetes apt repository
     apt_repository:
-      repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main"
+      repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v{{ kubernetes.version_short }}/deb/ /"
       filename: kubernetes
       state: present
 
@@ -126,9 +126,9 @@
       name: "{{ item }}"
       state: present
     loop:
-      - kubelet={{ kubernetes.version_full }}
-      - kubectl={{ kubernetes.version_full }}
-      - kubeadm={{ kubernetes.version_full }}
+      - kubelet
+      - kubectl
+      - kubeadm
 
   - name: Install jq package
     apt:
