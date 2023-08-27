@@ -3,7 +3,8 @@
   remote_user: root
   become:      yes
   roles:
-    # - disable-swap
+    - dns
+    - disable-swap
     # - bootup-modules
     # - apt-setup
     # - tools

@@ -1,13 +1,13 @@
 ---
 - block:
-  - name: Disable SWAP since kubernetes can't work with swap enabled (1/2)
+  - name: Disable swap
     become: yes
-    shell: |
-      swapoff -a
-  
-  - name: Disable SWAP in fstab since kubernetes can't work with swap enabled (2/2)
+    command: swapoff -a
+
+  - name: Add swapoff to crontab
     become: yes
-    replace:
-      path: /etc/fstab
-      regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
-      replace: '# \1'
+    cron:
+      name: "Disable swap during reboot"
+      user: root
+      special_time: reboot
+      job: "/sbin/swapoff -a"

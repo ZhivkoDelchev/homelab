@@ -1,0 +1,22 @@
+---
+- block:
+  - name: Create directory if not exists
+    become: yes
+    file:
+      path: /etc/systemd/resolved.conf.d
+      state: directory
+
+  - name: Configure DNS settings
+    become: yes
+    copy:
+      dest: /etc/systemd/resolved.conf.d/dns_servers.conf
+      content: |
+        [Resolve]
+        DNS={{ DNS_SERVERS }}
+    # notify:
+    #   - Restart systemd-resolved
+  - name: Restart systemd-resolved
+    become: yes
+    systemd:
+      name: systemd-resolved
+      state: restarted

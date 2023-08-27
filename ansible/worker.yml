@@ -3,5 +3,7 @@
   remote_user: root
   become:      yes
   roles:
+    - dns
+    - disable-swap
     - from-chatgpt
     - node
