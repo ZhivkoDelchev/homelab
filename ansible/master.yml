@@ -6,7 +6,7 @@
     - dns
     - disable-swap
     - bootup-modules
-    # - apt-setup
+    - apt-setup
     # - tools
     - from-chatgpt
     - control-plane

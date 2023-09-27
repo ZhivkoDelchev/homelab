@@ -1,33 +1,5 @@
 ---
 - block:
-  - name: Update apt cache
-    apt:
-      update_cache: yes
-    changed_when: false
-
-  - name: Import CRI-O repository keys
-    apt_key:
-      url: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ kubernetes.version_short }}/{{ os }}/Release.key"
-      state: present
-      keyring: /etc/apt/trusted.gpg.d/libcontainers.gpg
-    apt_key:
-        url: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ os }}/Release.key"
-        state: present
-        keyring: /etc/apt/trusted.gpg.d/libcontainers.gpg
-
-
-  - name: Add CRI-O version-specific repository
-    apt_repository:
-      repo: "deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ kubernetes.version_short }}/{{ os }}/ /"
-      state: present
-      filename: devel_kubic_libcontainers_stable_cri-o_{{ kubernetes.version_short }}
-  - name: Add CRI-O stable repository
-    apt_repository:
-      repo: "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ os }}/ /"
-      state: present
-      filename: devel_kubic_libcontainers_stable
-
-
   - name: Install CRI-O packages
     apt:
       name: "{{ item }}"
@@ -49,18 +21,6 @@
       enabled: yes
       state: started
 
-  - name: Add Kubernetes apt repository key
-    apt_key:
-      url: https://pkgs.k8s.io/core:/stable:/v{{ kubernetes.version_short }}/deb/Release.key
-      state: present
-      keyring: /etc/apt/keyrings/kubernetes-archive-keyring.gpg
-
-  - name: Add Kubernetes apt repository
-    apt_repository:
-      repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v{{ kubernetes.version_short }}/deb/ /"
-      filename: kubernetes
-      state: present
-
   - name: Install Kubernetes packages
     apt:
       name: "{{ item }}"
@@ -80,23 +40,9 @@
       path: /etc/default/kubelet
       line: "KUBELET_EXTRA_ARGS=--node-ip={{ local_ip }}"
       create: true
-    # notify:
-    #   - Restart kubelet
+
   - name: Restart kubelet
     systemd:
       name: kubelet
       state: restarted
 
-# handlers:
-  # - name: Restart systemd-resolved
-  #   systemd:
-  #     name: systemd-resolved
-  #     state: restarted
-
-  # - name: Apply sysctl parameters
-  #   command: sysctl --system
-
-  # - name: Restart kubelet
-  #   systemd:
-  #     name: kubelet
-  #     state: restarted

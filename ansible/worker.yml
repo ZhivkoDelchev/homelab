@@ -6,5 +6,6 @@
     - dns
     - disable-swap
     - bootup-modules
+    - apt-setup
     - from-chatgpt
     - node
