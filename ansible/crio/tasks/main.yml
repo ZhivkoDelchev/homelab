@@ -1,0 +1,25 @@
+---
+- block:
+  - name: Install CRI-O packages
+    become: yes
+    apt:
+      name: "{{ item }}"
+      state: present
+    loop:
+      - cri-o
+      - cri-o-runc
+
+  # Add other tasks related to CRI-O setup
+
+  - name: Add environment to crio configuration
+    become: yes
+    lineinfile:
+      path: /etc/default/crio
+      line: "{{ environment }}"
+
+  - name: Reload systemd and enable crio
+    become: yes
+    systemd:
+      name: crio
+      enabled: yes
+      state: started

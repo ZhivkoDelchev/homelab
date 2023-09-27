@@ -1,26 +1,5 @@
 ---
 - block:
-  - name: Install CRI-O packages
-    apt:
-      name: "{{ item }}"
-      state: present
-    loop:
-      - cri-o
-      - cri-o-runc
-
-  # Add other tasks related to CRI-O setup
-
-  - name: Add environment to crio configuration
-    lineinfile:
-      path: /etc/default/crio
-      line: "{{ environment }}"
-
-  - name: Reload systemd and enable crio
-    systemd:
-      name: crio
-      enabled: yes
-      state: started
-
   - name: Install Kubernetes packages
     apt:
       name: "{{ item }}"

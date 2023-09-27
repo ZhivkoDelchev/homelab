@@ -7,5 +7,6 @@
     - disable-swap
     - bootup-modules
     - apt-setup
-    - from-chatgpt
+    - crio
+    - k8s
     - node
