@@ -5,38 +5,6 @@
       update_cache: yes
     changed_when: false
 
-  # Install CRI-O Runtime
-  # Add your installation tasks here
-
-  - name: Load kernel modules
-    lineinfile:
-      path: /etc/modules-load.d/crio.conf
-      line: "{{ item }}"
-      create: true
-    loop:
-      - overlay
-      - br_netfilter
-
-  - name: Load kernel modules
-    modprobe:
-      name: "{{ item }}"
-    loop:
-      - overlay
-      - br_netfilter
-
-  - name: Configure sysctl parameters
-    copy:
-      dest: /etc/sysctl.d/99-kubernetes-cri.conf
-      content: |
-        net.bridge.bridge-nf-call-iptables = 1
-        net.ipv4.ip_forward = 1
-        net.bridge.bridge-nf-call-ip6tables = 1
-    # notify:
-    #   - Apply sysctl parameters
-  - name: Apply sysctl parameters
-    command: sysctl --system
-  
-  
   - name: Import CRI-O repository keys
     apt_key:
       url: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ kubernetes.version_short }}/{{ os }}/Release.key"
