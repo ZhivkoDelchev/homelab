@@ -8,6 +8,7 @@
       - kubelet
       - kubectl
       - kubeadm
+      - helm
 
   - name: Install jq package
     apt:

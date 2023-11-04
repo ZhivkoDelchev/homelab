@@ -42,6 +42,20 @@
       filename: kubernetes
       state: present
 
+  # Helm dependencies
+  - name: Add helm repository keys
+    become: yes
+    apt_key:
+      url:  https://baltocdn.com/helm/signing.asc
+      state: present
+      keyring: /etc/apt/keyrings/helm.gpg
+  
+  - name: Add Kubernetes apt repository
+    become: yes
+    apt_repository:
+      repo: "deb [signed-by=/etc/apt/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main"
+      filename: kubernetes
+      state: present
 
   # Update & Upgrade
   - name: Update and upgrade apt packages
