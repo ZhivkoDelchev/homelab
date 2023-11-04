@@ -10,29 +10,44 @@ NUM_WORKER_NODES = settings["nodes"]["workers"]["count"]
 KUBERNETES_VERSION_FULL = settings["software"]["kubernetes"]
 KUBERNETES_VERSION_SHORT = KUBERNETES_VERSION_FULL.match(/^([0-9]+\.[0-9]+)\.([0-9]+-[0-9]+)$/).captures[0]
 OS = settings["software"]["os"]
+DISTRO = settings["software"]["box"]
+SHARED_FOLDERS = settings["shared_folders"]
+CLUSTER_NAME = settings["cluster_name"]
+
+CALICO_VERSION = settings["software"]["calico"]
+POD_CIDR = settings["network"]["pod_cidr"]
+SERVICE_CIDR = settings["network"]["service_cidr"]
+DNS_SERVERS = settings["network"]["dns_servers"]
 
 ENVIRONMENT = settings["environment"]
+
+MASTER_NODE_IP = settings["network"]["control_ip"]
+MASTER_NODE_CPUS = settings["nodes"]["control"]["cpu"]
+MASTER_NODE_MEMORY = settings["nodes"]["control"]["memory"]
+
+WORKER_NODE_CPUS = settings["nodes"]["workers"]["cpu"]
+WORKER_NODE_MEMORY = settings["nodes"]["workers"]["memory"]
 
 Vagrant.configure("2") do |config|
  
   # config.vm.box = "ubuntu/jammy64"
 
-  config.vm.box = settings["software"]["box"]
+  config.vm.box = DISTRO
   config.vm.box_check_update = true
 
   config.vm.define "master" do |master|
     master.vm.hostname = "master-node"
-    master.vm.network "private_network", ip: settings["network"]["control_ip"]
-    if settings["shared_folders"]
-      settings["shared_folders"].each do |shared_folder|
+    master.vm.network "private_network", ip: MASTER_NODE_IP
+    if SHARED_FOLDERS
+      SHARED_FOLDERS.each do |shared_folder|
         master.vm.synced_folder shared_folder["host_path"], shared_folder["vm_path"]
       end
     end
     master.vm.provider "virtualbox" do |vb|
-        vb.cpus = settings["nodes"]["control"]["cpu"]
-        vb.memory = settings["nodes"]["control"]["memory"]
-        if settings["cluster_name"] and settings["cluster_name"] != ""
-          vb.customize ["modifyvm", :id, "--groups", ("/" + settings["cluster_name"])]
+        vb.cpus = MASTER_NODE_CPUS
+        vb.memory = MASTER_NODE_MEMORY
+        if CLUSTER_NAME and CLUSTER_NAME != ""
+          vb.customize ["modifyvm", :id, "--groups", ("/" + CLUSTER_NAME)]
         end
     end
     master.vm.provision "ansible_local" do |ansible|
@@ -46,11 +61,11 @@ Vagrant.configure("2") do |config|
         },
         os: OS,
         environment: ENVIRONMENT,
-        local_ip: settings["network"]["control_ip"],
-        calico_version: settings["software"]["calico"],
-        pod_cidr: settings["network"]["pod_cidr"],
-        service_cidr: settings["network"]["service_cidr"],
-        DNS_SERVERS: settings["network"]["dns_servers"].join(" ")
+        local_ip: MASTER_NODE_IP,
+        calico_version: CALICO_VERSION,
+        pod_cidr: POD_CIDR,
+        service_cidr: SERVICE_CIDR,
+        DNS_SERVERS: DNS_SERVERS.join(" ")
       }
     end
   end
@@ -60,16 +75,16 @@ Vagrant.configure("2") do |config|
     config.vm.define "node0#{i}" do |node|
       node.vm.hostname = "worker-node0#{i}"
       node.vm.network "private_network", ip: IP_NW + "#{IP_START + i}"
-      if settings["shared_folders"]
-        settings["shared_folders"].each do |shared_folder|
+      if SHARED_FOLDERS
+        SHARED_FOLDERS.each do |shared_folder|
           node.vm.synced_folder shared_folder["host_path"], shared_folder["vm_path"]
         end
       end
       node.vm.provider "virtualbox" do |vb|
-          vb.cpus = settings["nodes"]["workers"]["cpu"]
-          vb.memory = settings["nodes"]["workers"]["memory"]
-          if settings["cluster_name"] and settings["cluster_name"] != ""
-            vb.customize ["modifyvm", :id, "--groups", ("/" + settings["cluster_name"])]
+          vb.cpus = WORKER_NODE_CPUS
+          vb.memory = WORKER_NODE_MEMORY
+          if CLUSTER_NAME and CLUSTER_NAME != ""
+            vb.customize ["modifyvm", :id, "--groups", ("/" + CLUSTER_NAME)]
           end
       end
       node.vm.provision "ansible_local" do |ansible|
@@ -84,26 +99,12 @@ Vagrant.configure("2") do |config|
             os: OS,
             environment: ENVIRONMENT,
             local_ip: IP_NW + "#{IP_START + i}",
-            calico_version: settings["software"]["calico"],
-            pod_cidr: settings["network"]["pod_cidr"],
-            service_cidr: settings["network"]["service_cidr"],
-            DNS_SERVERS: settings["network"]["dns_servers"].join(" ")
+            calico_version: CALICO_VERSION,
+            pod_cidr: POD_CIDR,
+            service_cidr: SERVICE_CIDR,
+            DNS_SERVERS: DNS_SERVERS.join(" ")
         }
       end
-      # node.vm.provision "shell",
-      #   env: {
-      #     "DNS_SERVERS" => settings["network"]["dns_servers"].join(" "),
-      #     "ENVIRONMENT" => settings["environment"],
-      #     "KUBERNETES_VERSION" => settings["software"]["kubernetes"],
-      #     "OS" => settings["software"]["os"]
-      #   },
-      #   path: "scripts/common.sh"
-      # node.vm.provision "shell", path: "scripts/node.sh"
-
-      # # Only install the dashboard after provisioning the last worker (and when enabled).
-      # if i == NUM_WORKER_NODES and settings["software"]["dashboard"] and settings["software"]["dashboard"] != ""
-      #   node.vm.provision "shell", path: "scripts/dashboard.sh"
-      # end
     end
 
   end
