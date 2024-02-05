@@ -56,8 +56,7 @@ Vagrant.configure("2") do |config|
       ansible.playbook = "master.yml"
       ansible.extra_vars = {
         kubernetes: {
-          version_short: KUBERNETES_VERSION_SHORT,
-          version_full: KUBERNETES_VERSION_FULL
+          version_short: KUBERNETES_VERSION_SHORT
         },
         os: OS,
         environment: ENVIRONMENT,
@@ -93,8 +92,7 @@ Vagrant.configure("2") do |config|
         ansible.playbook = "worker.yml"
         ansible.extra_vars = {
            kubernetes: {
-              version_short: KUBERNETES_VERSION_SHORT,
-              version_full: KUBERNETES_VERSION_FULL
+              version_short: KUBERNETES_VERSION_SHORT
             },
             os: OS,
             environment: ENVIRONMENT,
