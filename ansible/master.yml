@@ -9,5 +9,4 @@
     - apt-setup
     - crio
     - k8s
-    # - tools
     - control-plane
