@@ -1,5 +1,10 @@
 ---
 - block:
+  - name: Check if ~/.kube/config already exists
+    stat:
+      path: $HOME/.kube/config
+    register: kube_config
+
   - name: Init control plane
     shell: | 
       NODENAME=$(hostname -s) && \
@@ -8,6 +13,7 @@
       mkdir -p "$HOME"/.kube && \
       sudo cp -i /etc/kubernetes/admin.conf "$HOME"/.kube/config && \
       sudo chown "$(id -u)":"$(id -g)" "$HOME"/.kube/config
+    when: not kube_config.stat.exists
   - name: Create k8s token
     shell: |
       config_path="/vagrant/configs"
@@ -20,6 +26,7 @@
       touch $config_path/join.sh
       chmod +x $config_path/join.sh
       kubeadm token create --print-join-command > $config_path/join.sh
+    when: not kube_config.stat.exists
   - name: Install calico network plugin
     shell: |
       # curl https://raw.githubusercontent.com/projectcalico/calico/v{{ calico_version }}/manifests/calico.yaml -O 
@@ -30,11 +37,13 @@
       sudo cp /vagrant/configs/config /home/vagrant/.kube/
       sudo chown 1000:1000 /home/vagrant/.kube/config
       EOF
+    when: not kube_config.stat.exists
   - name: Open port 6443
     become: true
     shell: |
       iptables -A INPUT -p tcp --dport 6443 -j ACCEPT
       mkdir /etc/iptables
       iptables-save > /etc/iptables/rules.v4
+    when: not kube_config.stat.exists
 
 
