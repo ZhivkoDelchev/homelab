@@ -7,8 +7,7 @@ IP_NW = IP_SECTIONS.captures[0]
 # Last octet excluding all dots:
 IP_START = Integer(IP_SECTIONS.captures[1])
 NUM_WORKER_NODES = settings["nodes"]["workers"]["count"]
-KUBERNETES_VERSION_FULL = settings["software"]["kubernetes"]
-KUBERNETES_VERSION_SHORT = KUBERNETES_VERSION_FULL.match(/^([0-9]+\.[0-9]+)\.([0-9]+-[0-9]+)$/).captures[0]
+KUBERNETES_VERSION_SHORT = settings["software"]["kubernetes"]
 OS = settings["software"]["os"]
 DISTRO = settings["software"]["box"]
 SHARED_FOLDERS = settings["shared_folders"]
