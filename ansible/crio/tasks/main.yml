@@ -7,7 +7,6 @@
       state: present
     loop:
       - cri-o
-      - cri-o-runc
 
   # Add other tasks related to CRI-O setup
 

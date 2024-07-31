@@ -27,10 +27,10 @@ nodes:
 # Mount additional shared folders from the host into each virtual machine.
 # Note that the project directory is automatically mounted at /vagrant.
 shared_folders:
-  - host_path: ../vm-persistence
+  - host_path: ../homelab-2-persistence
     vm_path: /home/vagrant/vm-persistence
 software:
-  box: bento/ubuntu-22.04
+  box: ubuntu/jammy64
   calico: 3.26.0
-  kubernetes: 1.28
-  os: xUbuntu_22.04
+  kubernetes: 1.29
+  ingress: 1.3.0

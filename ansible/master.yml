@@ -10,3 +10,5 @@
     - crio
     - k8s
     - control-plane
+    # - argocd
+    - tools

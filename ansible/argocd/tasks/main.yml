@@ -1,0 +1,30 @@
+---
+- blcok:
+  - name: Create argocd namespace
+    shell: kubectl create namespace argocd
+  - name: Install argocd
+    shell: kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+  - name: Check if argocd already exists
+    stat:
+      path: /usr/local/bin/argocd
+    register: argocd_cli_file
+  - name: Install argocd cli
+    shell: |
+      curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64 && \
+      sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd && \
+      rm argocd-linux-amd64
+    when: not argocd_cli_file.stat.exists
+  
+  - name: Portforward argocd on port 8080
+    shell: kubectl port-forward svc/argocd-server -n argocd 8080:443 &
+
+  - name: Read argocd password
+    shell: argocd admin initial-password -n argocd
+    register: argocd_password_result
+  - name: Set argocd password variable
+    set_fact:
+      argocd-password: "{{ argocd_password_result.stdout_lines[0] }}"
+    when: argocd_password_result.rc == 0
+  - name: Argocd login
+    shell: "argocd login --insecure --username admin --password {{ argocd-password }} localhost:8080"

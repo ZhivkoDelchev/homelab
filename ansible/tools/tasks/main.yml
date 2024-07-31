@@ -1,0 +1,6 @@
+---
+- block:
+  - name: Install k9s
+    shell: sudo snap install k9s --devmode
+  - name: Create soft link
+    shell: sudo ln -s /snap/k9s/current/bin/k9s /snap/bin/
